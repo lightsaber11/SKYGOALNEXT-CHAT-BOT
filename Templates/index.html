@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #2f2d2d;
+      }
+
+      .chat-container {
+        width: 95%;
+        height: 98%;
+        background: #000000;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .chat-box {
+        height: 91.5%;
+        padding: 10px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .message {
+        margin: 10px 0;
+        padding: 8px 12px;
+        border-radius: 20px;
+        max-width: 75%;
+        clear: both;
+      }
+
+      .user-message {
+        background-color: #000000;
+        color: white;
+        float: right;
+      }
+
+      .bot-message {
+        background-color: #e9ecef;
+        float: left;
+      }
+
+      #user-input {
+        width: 80%;
+        padding: 10px;
+        border: none;
+        border-top: 1px solid #ddd;
+        outline: none;
+        background-color: black;
+        color: white;
+      }
+
+      #send-btn {
+        width: 18%;
+        padding: 10px;
+        border: none;
+        background: #058d15;
+        color: white;
+        cursor: pointer;
+        float: right;
+      }
+
+      #send-btn:hover {
+        background: #06cb20;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-box" id="chat-box"></div>
+      <input
+        type="text"
+        id="user-input"
+        placeholder="Type your message here..."
+      />
+      <button id="send-btn">Send</button>
+    </div>
+
+    <script>
+      document
+        .getElementById('send-btn')
+        .addEventListener('click', function () {
+          var userInput = document.getElementById('user-input').value;
+          if (userInput.trim() !== '') {
+            appendMessage('You', userInput);
+            fetch('/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ message: userInput }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                appendMessage('Chatbot', data.response);
+                document.getElementById('user-input').value = '';
+              });
+          }
+        });
+
+      function appendMessage(sender, message) {
+        var chatBox = document.getElementById('chat-box');
+        var messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(
+          sender === 'You' ? 'user-message' : 'bot-message'
+        );
+        messageElement.innerText = `${sender}: ${message}`;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
